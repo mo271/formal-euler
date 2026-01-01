@@ -73,7 +73,6 @@ theorem exception_impar (a m : ℕ) (h_odd : Odd a) :
   exact (h_odd.pow.add_one).two_dvd
 
 
-
 /-!
 Deinde quoque, etiamsi $a$ denotet numerum parem, innumeri tamen dantur casus, quibus numerus
 compositus prodit. Ita haec saltem formula $a^2+1$ potest dividi per $5$, quoties est $a=5b\pm3$,
@@ -194,7 +193,7 @@ theorem non_omnis_mersennus_primus : ¬ (∀ n, n.Prime → (2 ^ n - 1).Prime) :
 /-!
 Namque $2^{11} - 1$ i. e. $2047$ divisores habet $23$ ...
 -/
-theorem exm : (2 ^ 11 - 1).primeFactors = {23, 89} := by
+example : (2 ^ 11 - 1).primeFactors = {23, 89} := by
   simp [Nat.primeFactors]
 
 /-!
@@ -307,6 +306,88 @@ theorem assertio_euleri : ∀ n ∈ indices_euleri, (n ∈ [1, 41, 47] ∨ (2 ^ 
   intro n h
   simp only [List.mem_cons, List.not_mem_nil, or_false] at h
   rcases h with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> norm_num
+
+
+/-!
+Deduxi has observationes ex theoremate quodam non ineleganti, cuius quidem demonstrationem quoque
+non habeo, verum tamen de eius veritate sum certissimus.
+Theorema hoc est: $a^n - b^n$ semper potest dividi per $n+1$, si $n+1$ fuerit numerus primus atque
+$a$ et $b$ non possint per eum dividi...
+-/
+theorem non_inelegans (a b n : ℕ) (h_prime : Fact (n + 1).Prime)
+    (ha : ¬ (n + 1) ∣ a) (hb : ¬ (n + 1) ∣ b) :
+    (n + 1) ∣ (a ^ n - b ^ n) := by
+  let p := n + 1
+  have ha_pow : a ^ n % p = 1 := by
+    erw [← ZMod.val_natCast, Nat.cast_pow, ZMod.pow_card_sub_one_eq_one
+      (by apply ha.comp (CharP.cast_eq_zero_iff _ _ _).1), ZMod.val_one]
+  have hb_pow : b ^ n % p = 1 := by
+    erw [← ZMod.val_natCast, Nat.cast_pow, ZMod.pow_card_sub_one_eq_one
+      (by apply hb.comp (CharP.cast_eq_zero_iff _ _ _).1), ZMod.val_one]
+  have : a ^ n ≡ b ^ n [MOD p] := by rw [Nat.ModEq, ha_pow, hb_pow]
+  exact (p.dvd_of_mod_eq_zero) (Nat.sub_mod_eq_zero_of_mod_eq this)
+
+
+/-!
+... eo autem difficiliorem puto eius demonstrationem esse, quia non est verum, nisi $n+1$ sit
+numerus primus.
+-/
+theorem necessitas_primitatis (n : ℕ) (h_not_prime : ¬ (n + 1).Prime) (hn : 0 < n):
+    ¬ (∀ a b : ℕ, ¬ (n + 1) ∣ a → ¬ (n + 1) ∣ b → (n + 1) ∣ (a ^ n - b ^ n)) := by
+  sorry
+
+/-!
+Ex hoc statim sequitur $2^n - 1$ semper dividi posse per $n+1$, si fuerit $n+1$ numerus primus, ...
+-/
+theorem corollarium_non_inelegans (n : ℕ) (h_prime : Fact (n + 1).Prime) (h_ne_two : n + 1 ≠ 2) :
+    (n + 1) ∣ (2 ^ n - 1) := by
+  have := non_inelegans 2 1 n h_prime
+  simp only [Nat.dvd_one, Nat.add_eq_right, one_pow] at this
+  apply this
+  · rwa [Nat.prime_dvd_prime_iff_eq h_prime.1 (by decide)]
+  · intro h
+    rw [h] at h_prime
+    tauto
+
+/-!
+... seu, cum omnis primus sit impar praeter $2$ hicque ob conditiones theorematis, quia est $a=2$,
+non possit adhiberi,...
+-/
+theorem exclusio_binarii (n : ℕ) (h_prime : (n + 1).Prime) (h_two : n + 1 = 2) :
+    ¬ (¬ (n + 1) ∣ 2) := by
+  rw [h_two]
+  simp
+
+
+/-!
+... poterit $2^{2m} - 1$ semper dividi per $2m+1$ si $2m+1$ sit numerus primus.
+-/
+theorem corollarium_non_inelegans' (m : ℕ) (h_prime : Fact (2 * m + 1).Prime) :
+    (2 * m + 1) ∣ (2 ^ (2 * m) - 1) := by
+  have := non_inelegans 2 1 (2 * m) h_prime
+  simp at this
+  apply this
+  · use h_prime.1.ne_one.comp ( Odd.coprime_two_right ⟨m, rfl⟩).eq_one_of_dvd
+  · intro h
+    rw [h] at h_prime
+    tauto
+
+
+
+/-!
+Quare etiam vel $2^m + 1$ vel $2^m - 1$ dividi poterit per $2 * m + 1$.
+Deprehendi autem $2^m + 1$ posse dividi, si fuerit $m = 4p + 1$ vel $4p + 2$;...
+-/
+theorem conditio_divisibilitatis_plus (m : ℕ) (h_prime : (2 * m + 1).Prime) :
+    (∃ p, m = 4 * p + 1 ∨ m = 4 * p + 2) → (2 * m + 1) ∣ (2 ^ m + 1) := by
+  sorry
+
+/-!
+... at $2^m - 1$ habebit divisorem $2m + 1$, si $m = 4p$ vel $4p - 1$.
+-/
+theorem conditio_divisibilitatis_minus (m : ℕ) (h_prime : (2 * m + 1).Prime) :
+    (∃ p, m = 4 * p ∨ m = 4 * p - 1) → (2 * m + 1) ∣ (2 ^ m - 1) := by
+  sorry
 
 
 
