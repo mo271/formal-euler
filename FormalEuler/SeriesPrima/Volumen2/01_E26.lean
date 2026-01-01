@@ -35,7 +35,6 @@ in hac forma $a^{2^m}+1$.
 -/
 theorem forma_numerorum_primorum (a n : ℕ) (h_prime : (a ^ n + 1).Prime) (ha : 1 < a) (hn : 1 < n) :
     ∃ m : ℕ, n = 2 ^ m := by
-  -- TODO(firsching)
   by_contra hm
   simp at hm
   have : ∃ m > 0, ∃ p > 1, n = p * (2 * m + 1) := by
@@ -156,7 +155,6 @@ divisores, ...
 -/
 theorem si_n_compositus_mersennus_compositus (n : ℕ) (h : ¬ n.Prime) (hn : 1 < n) :
     ¬ (2 ^ n - 1).Prime := by
-  -- TODO(firsching)
   refine (Nat.not_prime_iff_exists_dvd_ne ?_).mpr ?_
   · exact (2).le_pred_of_lt (lt_self_pow₀ (by decide) hn)
   · have : ∃ x > 1, ∃ y > 1, x < n ∧ y < n ∧ n = x * y := by
@@ -171,7 +169,6 @@ theorem si_n_compositus_mersennus_compositus (n : ℕ) (h : ¬ n.Prime) (hn : 1 
 -/
 theorem si_n_compositus_compositus (n a : ℕ) (h : ¬ n.Prime) (hn : 1 < n) (ha : 1 < a):
     ¬ (a ^ n - 1).Prime := by
-  -- TODO(firsching)
   refine (Nat.not_prime_iff_exists_dvd_ne ?_).mpr ?_
   · exact (Nat.lt_pow_self ha).le_pred.trans' hn
   · have : ∃ x > 1, ∃ y > 1, x < n ∧ y < n ∧ n = x * y := by
@@ -215,7 +212,6 @@ Dat autem $2^{n-1}(2^n - 1)$ numerum perfectum, quoties $2^n - 1$ est primus, ..
 theorem generatio_perfecti (n : ℕ) (h_prime : (2 ^ n - 1).Prime) :
     ((2 ^ (n - 1) * (2 ^ n - 1))).Perfect := by
   constructor
-  -- TODO(firsching)
   · sorry
   · exact (Nat.mul_pos (n - 1).two_pow_pos) (h_prime).pos
 
